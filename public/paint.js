@@ -7,6 +7,7 @@ var touchX,touchY;
 // Keep track of the old/last position when drawing a line
 // We set it to -1 at the start to indicate that we don't have a good value for it yet
 var lastX,lastY=-1;
+var lastrX,lastrY=-1;
 
 var socket;
 
@@ -42,6 +43,38 @@ function drawLine(ctx,x,y,size) {
     // Update the last position to reference the current position
     lastX=x;
     lastY=y;
+}
+
+function drawLine_remote(ctx,x,y,size,socketid) {
+    // If lastX is not set, set lastX and lastY to the current position 
+    if (lastrX==-1) {
+        lastrX=x;
+        lastrY=y;
+    }
+    
+    ctx.strokeStyle = '#f4ad42';
+    ctx.fillStyle = '#f4ad42';
+    
+    ctx.lineCap = "round";
+    //ctx.lineJoin = "round";
+    
+    ctx.beginPath();
+    
+    // First, move to the old (previous) position
+    ctx.moveTo(lastrX,lastrY);
+    
+    // Now draw a line to the current touch/pointer position
+    ctx.lineTo(x,y);
+    
+    // Set the line thickness and draw the line
+    ctx.lineWidth = size;
+    ctx.stroke();
+    
+    ctx.closePath();
+    
+    // Update the last position to reference the current position
+    lastrX=x;
+    lastrY=y;
 }
 
 document.getElementById("clear").addEventListener("click", function(){
@@ -152,14 +185,18 @@ function init() {
     canvas.height = window.innerHeight;
 
     socket = io.connect();
+
+    console.log('socket:');
+    console.log(socket.id);
     
     socket.on('mouse', 
         // When we receive data
         function(data) {
 
         console.log("Got: " + data.x + " " + data.y);
+
         //lastX=-1;
-        drawLine(ctx,data.x,data.y,2); 
+        drawLine_remote(ctx,data.x,data.y,2,socket.id); 
         }
     );
 
@@ -170,7 +207,7 @@ function init() {
         console.log("Got: mouseup");
         //lastX=-1;
         //drawLine(ctx,data.x,data.y,2); 
-        lastX=-1;
+        lastrX=-1;
         }
     );
 
@@ -180,7 +217,7 @@ function init() {
 
         console.log("Got: " + data.x + " " + data.y);
         //lastX=-1;
-        drawLine(ctx,data.x,data.y,2); 
+        drawLine_remote(ctx,data.x,data.y,2,socket.id); 
         }
     );
 
@@ -191,7 +228,7 @@ function init() {
         console.log("Got: mouseup");
         //lastX=-1;
         //drawLine(ctx,data.x,data.y,2); 
-        lastX=-1;
+        lastrX=-1;
         }
     );
 
