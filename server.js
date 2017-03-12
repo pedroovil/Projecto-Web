@@ -9,7 +9,7 @@ function listen() {
   console.log('HigherMat listening at ' + host + ' ' + port);
 }
 
-app.use(express.static('public'));
+app.use(express.static('lobby'));
 
 var io = require('socket.io')(server);
 
