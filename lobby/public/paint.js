@@ -6,6 +6,15 @@ var touchX,touchY;
 
 // Keep track of the old/last position when drawing a line
 // We set it to -1 at the start to indicate that we don't have a good value for it yet
+
+
+var myMapCoord = new Map();
+
+function lastCoord (lx,ly) {
+    this.lastX = lx;
+    this.lastY = ly; 
+}
+
 var lastX,lastY=-1;
 var lastrX,lastrY=-1;
 
@@ -46,12 +55,30 @@ function drawLine(ctx,x,y,size) {
 }
 
 function drawLine_remote(ctx,x,y,size,socketid) {
+    console.log('socket:');
+    console.log(socketid);
+
     // If lastX is not set, set lastX and lastY to the current position 
-    if (lastrX==-1) {
-        lastrX=x;
-        lastrY=y;
-    }
+ //   if (lastrX==-1) {
+  //      lastrX=x;
+   //     lastrY=y;
+  //  }
     
+ if (lc = myMapCoord.get(socketid)) {   
+   // console.log('lc '+lc);
+    if (lc.lastX == -1) {
+        lastrX = x;
+        lastrY = y;
+    } else {
+    lastrX = lc.lastX;
+    lastrY = lc.lastY;
+    }
+ } else {
+    console.log('new remote');
+    lc = new lastCoord(x,y);
+    myMapCoord.set(socket.lc);
+ }
+
     ctx.strokeStyle = '#f4ad42';
     ctx.fillStyle = '#f4ad42';
     
@@ -73,8 +100,13 @@ function drawLine_remote(ctx,x,y,size,socketid) {
     ctx.closePath();
     
     // Update the last position to reference the current position
-    lastrX=x;
-    lastrY=y;
+    //lastrX=x;
+    //lastrY=y;
+
+    lc.lastX = x;
+    lc.lastY = y;
+
+    myMapCoord.set(socketid,lc);
 }
 
 document.getElementById("clear").addEventListener("click", function(){
@@ -186,17 +218,15 @@ function init() {
 
     socket = io.connect();
 
-    console.log('socket:');
-    console.log(socket.id);
-    
     socket.on('mouse', 
         // When we receive data
         function(data) {
 
-        console.log("Got: " + data.x + " " + data.y);
+        console.log("Got: mouseup" + data.sid);
+       // console.log("Got: " + data.x + " " + data.y);
 
         //lastX=-1;
-        drawLine_remote(ctx,data.x,data.y,2,socket.id); 
+        drawLine_remote(ctx,data.x,data.y,2,data.sid); 
         }
     );
 
@@ -204,20 +234,22 @@ function init() {
         // When we receive data
         function(data) {
 
-        console.log("Got: mouseup");
+         console.log("Got: mouseup" + data);
         //lastX=-1;
         //drawLine(ctx,data.x,data.y,2); 
-        lastrX=-1;
+        //lastrX=-1;
+        lc = new lastCoord(-1,-1);
+        myMapCoord.set(data,lc);
         }
     );
 
     socket.on('touch', 
         // When we receive data
         function(data) {
-
-        console.log("Got: " + data.x + " " + data.y);
+        console.log("Got: mouseup" + data.sid);
+     // console.log("Got: " + data.x + " " + data.y);
         //lastX=-1;
-        drawLine_remote(ctx,data.x,data.y,2,socket.id); 
+        drawLine_remote(ctx,data.x,data.y,2,data.sid); 
         }
     );
 
@@ -225,10 +257,12 @@ function init() {
         // When we receive data
         function(data) {
 
-        console.log("Got: mouseup");
+        console.log("Got: touchend" + data);
         //lastX=-1;
         //drawLine(ctx,data.x,data.y,2); 
-        lastrX=-1;
+        //lastrX=-1;
+        lc = new lastCoord(-1,-1);
+        myMapCoord.set(data,lc);
         }
     );
 
