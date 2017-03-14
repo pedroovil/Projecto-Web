@@ -9,7 +9,7 @@ function listen() {
   console.log('HigherMat listening at ' + host + ' ' + port);
 }
 
-app.use(express.static('public'));
+app.use(express.static('lobby'));
 
 var io = require('socket.io')(server);
 
@@ -21,6 +21,7 @@ io.sockets.on('connection', function (socket) {
     socket.on('mouse',
       	function(data) {
         // Data comes in as whatever was sent, including objects
+        data.sid = socket.id;
         console.log("Received: 'mouse' " + data.x + " " + data.y);
       
         // Send it to all other clients
@@ -38,7 +39,7 @@ io.sockets.on('connection', function (socket) {
         console.log("Received: 'mouseup' ");
       
         // Send it to all other clients
-        socket.broadcast.emit('mouseup', 'xxx');
+        socket.broadcast.emit('mouseup', socket.id);
         
         // This is a way to send to everyone including sender
         // io.sockets.emit('message', "this goes to everyone");
@@ -50,6 +51,7 @@ io.sockets.on('connection', function (socket) {
       function(data) {
         // Data comes in as whatever was sent, including objects
         console.log("Received: 'touch' " + data.x + " " + data.y);
+        data.sid = socket.id;
       
         // Send it to all other clients
         socket.broadcast.emit('touch', data);
@@ -66,11 +68,18 @@ io.sockets.on('connection', function (socket) {
         console.log("Received: 'touchend' ");
       
         // Send it to all other clients
-        socket.broadcast.emit('touchend', 'xxx');
+        socket.broadcast.emit('touchend', socket.id);
         
         // This is a way to send to everyone including sender
         // io.sockets.emit('message', "this goes to everyone");
 
+      }
+    );
+
+    socket.on('clear',
+    	function() {
+    	console.log("Canvas cleared");
+        socket.broadcast.emit('clear');
       }
     );
     
