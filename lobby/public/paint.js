@@ -79,8 +79,6 @@ function drawLine_remote(ctx,x,y,size,socketid) {
     myMapCoord.set(socket.lc);
  }
 
-
-
     ctx.strokeStyle = '#f4ad42';
     ctx.fillStyle = '#f4ad42';
     
@@ -222,12 +220,10 @@ function init() {
     canvas.height = window.innerHeight;
 
     socket = io.connect();   
-    
+
     socket.on('mouse', 
         // When we receive data
         function(data) {
-
-
         console.log("Got: mouseup" + data.sid);
        // console.log("Got: " + data.x + " " + data.y);
 
@@ -253,7 +249,9 @@ function init() {
         // When we receive data
         function(data) {
         console.log("Got: mouseup" + data.sid);
-     //   console.log("Got: " + data.x + " " + data.y);
+
+     // console.log("Got: " + data.x + " " + data.y);
+
         //lastX=-1;
         drawLine_remote(ctx,data.x,data.y,2,data.sid); 
         }
