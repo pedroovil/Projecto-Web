@@ -16,8 +16,8 @@ html, body {
 } /* just to be sure these are full screen*/
 
 #sketch {
-    width: 1000px;
-    height: 1000px;
+    width: 2000px;
+    height: 2000px;
     float:left;
     position:relative; /* Necessary for correct mouse co-ords in Firefox */
     cursor: crosshair;
