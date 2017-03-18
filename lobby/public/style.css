@@ -10,17 +10,19 @@
 
 html, body {
     margin:0px;
-	padding:0px;
+    padding:0px;
     width:100%; 
     height:100%; 
 } /* just to be sure these are full screen*/
 
 #sketch {
+    width: 1000px;
+    height: 1000px;
     float:left;
     position:relative; /* Necessary for correct mouse co-ords in Firefox */
     cursor: crosshair;
 }
-
+/*
 #toolbar{
     float: left;
     width: 40px;
@@ -31,18 +33,19 @@ html, body {
     background-color: #2f2f2f;
     color: white;
     z-index: 1;
-}
-
+}*/
+/*
 #title{
-	float: left;
+    float: left;
     position: fixed;
     top: 300px;
     padding: 8px;
 }
-
+*/
+/*
 #clear{
     -webkit-transition-duration: 0.4s; /* Safari */
-    transition-duration: 0.4s;
+/*    transition-duration: 0.4s;
     float: left;
     position: fixed;
     top: 215px;
@@ -59,3 +62,4 @@ html, body {
     cursor: pointer;
     color: black;
 }
+*/

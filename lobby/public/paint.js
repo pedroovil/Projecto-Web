@@ -4,9 +4,11 @@ var mouseX,mouseY,mouseDown=0;
 
 var touchX,touchY;
 
+var sketch = document.querySelector('#sketch');
+var sketch_style = getComputedStyle(sketch);
+
 // Keep track of the old/last position when drawing a line
 // We set it to -1 at the start to indicate that we don't have a good value for it yet
-
 
 var myMapCoord = new Map();
 
@@ -19,6 +21,14 @@ var lastX,lastY=-1;
 var lastrX,lastrY=-1;
 
 var socket;
+
+// current tool
+var tool = 'brush';
+
+$('#tools button').on('click touch', function(){
+	tool = $(this).attr('id');
+	console.log(tool);
+})
 
 // Draws a line between the specified position on the supplied canvas name
 // Parameters are: A canvas context, the x position, the y position, the size of the dot
@@ -109,6 +119,85 @@ function drawLine_remote(ctx,x,y,size,socketid) {
     myMapCoord.set(socketid,lc);
 }
 
+function drawEraser(ctx,x,y) {
+    // If lastX is not set, set lastX and lastY to the current position 
+    if (lastX==-1) {
+        lastX=x;
+        lastY=y;
+    }
+    
+    ctx.globalCompositeOperation = 'destination-out';
+	ctx.fillStyle = 'rgba(0,0,0,1)';
+	ctx.strokeStyle = 'rgba(0,0,0,1)';
+    
+    ctx.lineCap = "round";
+    //ctx.lineJoin = "round";
+    
+    ctx.beginPath();
+    
+    // First, move to the old (previous) position
+    ctx.moveTo(lastX,lastY);
+    
+    // Now draw a line to the current touch/pointer position
+    ctx.lineTo(x,y);
+    
+    // Set the line thickness and draw the line
+    ctx.lineWidth = 5;
+    ctx.stroke();
+    
+    ctx.closePath();
+    
+    // Update the last position to reference the current position
+    lastX=x;
+    lastY=y;
+}
+
+function drawEraser_remote(ctx,x,y,socketid) {
+	console.log('socket:');
+    console.log(socketid);
+
+    if (lc = myMapCoord.get(socketid)) {
+
+    if (lc.lastX == -1) {
+        lastrX = x;
+        lastrY = y;
+    } else {
+    lastrX = lc.lastX;
+    lastrY = lc.lastY;
+    }
+ } else {
+    console.log('new remote');
+    lc = new lastCoord(x,y);
+    myMapCoord.set(socket.lc);
+ }
+    
+    ctx.globalCompositeOperation = 'destination-out';
+	ctx.fillStyle = 'rgba(0,0,0,1)';
+	ctx.strokeStyle = 'rgba(0,0,0,1)';
+    
+    ctx.lineCap = "round";
+    //ctx.lineJoin = "round";
+    
+    ctx.beginPath();
+    
+    // First, move to the old (previous) position
+    ctx.moveTo(lastrX,lastrY);
+    
+    // Now draw a line to the current touch/pointer position
+    ctx.lineTo(x,y);
+    
+    // Set the line thickness and draw the line
+    ctx.lineWidth = 5;
+    ctx.stroke();
+    
+    ctx.closePath();
+    
+    lc.lastX = x;
+    lc.lastY = y;
+
+    myMapCoord.set(socketid,lc);
+}
+
 document.getElementById("clear").addEventListener("click", function clear(){
     if (confirm("Deseja apagar tudo?")) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -121,7 +210,7 @@ document.getElementById("clear").addEventListener("click", function clear(){
 // Keep track of the mouse button being pressed and draw a dot at current location
 function sketch_mouseDown() {
     mouseDown=1;
-    drawLine(ctx,mouseX,mouseY,2);
+    onTool();
     sendmouse(mouseX,mouseY);
 }
 
@@ -133,6 +222,7 @@ function sketch_mouseUp() {
     lastX=-1;
     lastY=-1;
     socket.emit('mouseup','xxx');
+    ctx.globalCompositeOperation = 'source-over';
 }
 
 // Keep track of the mouse position and draw a dot if mouse button is currently pressed
@@ -142,7 +232,7 @@ function sketch_mouseMove(e) {
 
     // Draw a dot if the mouse button is currently being pressed
     if (mouseDown==1) {
-        drawLine(ctx,mouseX,mouseY,2);
+        onTool();
         sendmouse(mouseX,mouseY);
     }
 }
@@ -167,7 +257,7 @@ function sketch_touchStart() {
     // Update the touch co-ordinates
     getTouchPos();
 
-    drawLine(ctx,touchX,touchY,2);
+    onToolTouch();
     sendtouch(touchX,touchY);
 
     // Prevents an additional mousedown event being triggered
@@ -178,7 +268,7 @@ function sketch_touchEnd() {
     // Reset lastX and lastY to -1 to indicate that they are now invalid, since we have lifted the "pen"
     lastX=-1;
     lastY=-1;
-
+    ctx.globalCompositeOperation = 'source-over';
     socket.emit('touchend','xxx');
 }
 
@@ -188,7 +278,7 @@ function sketch_touchMove(e) {
     getTouchPos(e);
 
     // During a touchmove event, unlike a mousemove event, we don't need to check if the touch is engaged, since there will always be contact with the screen by definition.
-    drawLine(ctx,touchX,touchY,2);
+    onToolTouch();
     sendtouch(touchX,touchY);
 
     // Prevent a scrolling action as a result of this touchmove triggering.
@@ -216,8 +306,8 @@ function getTouchPos(e) {
 function init() {
     // Get the specific canvas element from the HTML document
     canvas = document.getElementById('sketch');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.width = parseInt(sketch_style.getPropertyValue('width'));
+    canvas.height = parseInt(sketch_style.getPropertyValue('height'));
 
     socket = io.connect();   
 
@@ -228,7 +318,8 @@ function init() {
        // console.log("Got: " + data.x + " " + data.y);
 
         //lastX=-1;
-        drawLine_remote(ctx,data.x,data.y,2,data.sid); 
+        drawLine_remote(ctx,data.x,data.y,2,data.sid);
+        //drawEraser_remote(ctx,data.x,data.y,2,data.sid);
         }
     );
 
@@ -253,7 +344,8 @@ function init() {
      // console.log("Got: " + data.x + " " + data.y);
 
         //lastX=-1;
-        drawLine_remote(ctx,data.x,data.y,2,data.sid); 
+        drawLine_remote(ctx,data.x,data.y,2,data.sid);
+        //drawEraser_remote(ctx,data.x,data.y,2,data.sid); 
         }
     );
 
@@ -297,7 +389,7 @@ function init() {
     //***Matematica***  
     var imageObj = new Image();
     imageObj.onload = function() {
-    ctx.drawImage(imageObj, 0, 0);
+    ctx.drawImage(imageObj, 30, 0);
     };
     imageObj.src = 'imgs/matematica.png';
     //************* 
@@ -328,3 +420,21 @@ function sendtouch(xpos, ypos) {
   // Send that object to the socket
   socket.emit('touch',data);
 }
+
+var onTool = function() {
+	
+	if ( tool == 'brush' )
+	{	drawLine(ctx,mouseX,mouseY,2); }
+	
+	else if ( tool == 'eraser' )
+	{	drawEraser(ctx,mouseX,mouseY,2); }
+};
+
+var onToolTouch = function() {
+	
+	if ( tool == 'brush' )
+	{	drawLine(ctx,touchX,touchY,2) }
+	
+	else if ( tool == 'eraser' )
+	{	drawEraser(ctx,touchX,touchY,2) }
+};
