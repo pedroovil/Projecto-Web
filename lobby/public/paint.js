@@ -33,15 +33,17 @@ $('#tools button').on('click touch', function(){
 // Draws a line between the specified position on the supplied canvas name
 // Parameters are: A canvas context, the x position, the y position, the size of the dot
 function drawLine(ctx,x,y,size) {
+    console.log('local line');
     // If lastX is not set, set lastX and lastY to the current position 
     if (lastX==-1) {
         lastX=x;
         lastY=y;
     }
     
+    //ctx.globalCompositeOperation = 'source-over';
     ctx.strokeStyle = '#00b6ff';
     ctx.fillStyle = '#00b6ff';
-    
+
     ctx.lineCap = "round";
     //ctx.lineJoin = "round";
     
@@ -65,15 +67,16 @@ function drawLine(ctx,x,y,size) {
 }
 
 function drawLine_remote(ctx,x,y,size,socketid) {
-    console.log('socket:');
-    console.log(socketid);
+    //console.log('socket:');
+    //console.log(socketid);
 
     // If lastX is not set, set lastX and lastY to the current position 
  //   if (lastrX==-1) {
   //      lastrX=x;
    //     lastrY=y;
   //  }
-    
+
+ console.log('remote line');
  if (lc = myMapCoord.get(socketid)) {   
    // console.log('lc '+lc);
     if (lc.lastX == -1) {
@@ -120,15 +123,21 @@ function drawLine_remote(ctx,x,y,size,socketid) {
 }
 
 function drawEraser(ctx,x,y) {
+
+    console.log('local eraser');
     // If lastX is not set, set lastX and lastY to the current position 
     if (lastX==-1) {
         lastX=x;
         lastY=y;
     }
     
-    ctx.globalCompositeOperation = 'destination-out';
-	ctx.fillStyle = 'rgba(0,0,0,1)';
-	ctx.strokeStyle = 'rgba(0,0,0,1)';
+    //ctx.globalCompositeOperation = 'destination-out';
+	
+    //ctx.fillStyle = 'rgba(0,0,0,1)';
+	//ctx.strokeStyle = 'rgba(0,0,0,1)';
+
+    ctx.strokeStyle = '#ffffff';
+    ctx.fillStyle = '#ffffff';
     
     ctx.lineCap = "round";
     //ctx.lineJoin = "round";
@@ -153,8 +162,9 @@ function drawEraser(ctx,x,y) {
 }
 
 function drawEraser_remote(ctx,x,y,socketid) {
-	console.log('socket:');
-    console.log(socketid);
+    console.log('remote eraser');
+	//console.log('socket:');
+    //console.log(socketid);
 
     if (lc = myMapCoord.get(socketid)) {
 
@@ -171,9 +181,9 @@ function drawEraser_remote(ctx,x,y,socketid) {
     myMapCoord.set(socket.lc);
  }
     
-    ctx.globalCompositeOperation = 'destination-out';
-	ctx.fillStyle = 'rgba(0,0,0,1)';
-	ctx.strokeStyle = 'rgba(0,0,0,1)';
+    //ctx.globalCompositeOperation = 'destination-out';
+    ctx.strokeStyle = '#ffffff';
+    ctx.fillStyle = '#ffffff';
     
     ctx.lineCap = "round";
     //ctx.lineJoin = "round";
@@ -222,7 +232,7 @@ function sketch_mouseUp() {
     lastX=-1;
     lastY=-1;
     socket.emit('mouseup','xxx');
-    ctx.globalCompositeOperation = 'source-over';
+    //ctx.globalCompositeOperation = 'source-over';
 }
 
 // Keep track of the mouse position and draw a dot if mouse button is currently pressed
@@ -268,7 +278,7 @@ function sketch_touchEnd() {
     // Reset lastX and lastY to -1 to indicate that they are now invalid, since we have lifted the "pen"
     lastX=-1;
     lastY=-1;
-    ctx.globalCompositeOperation = 'source-over';
+    //ctx.globalCompositeOperation = 'source-over';
     socket.emit('touchend','xxx');
 }
 
@@ -314,13 +324,19 @@ function init() {
     socket.on('mouse', 
         // When we receive data
         function(data) {
-        console.log("Got: mouseup" + data.sid);
+        console.log("Got: mouse" + data.sid);
        // console.log("Got: " + data.x + " " + data.y);
 
         //lastX=-1;
-        drawLine_remote(ctx,data.x,data.y,2,data.sid);
-        //drawEraser_remote(ctx,data.x,data.y,2,data.sid);
+
+        if ( data.rtool == 'brush' )
+        {   drawLine_remote(ctx,data.x,data.y,2,data.sid); }
+        
+        else if ( data.rtool == 'eraser' )
+        {   drawEraser_remote(ctx,data.x,data.y,2,data.sid); }
+
         }
+
     );
 
     socket.on('mouseup', 
@@ -339,14 +355,20 @@ function init() {
     socket.on('touch', 
         // When we receive data
         function(data) {
-        console.log("Got: mouseup" + data.sid);
+        console.log("Got: touch" + data.sid);
 
      // console.log("Got: " + data.x + " " + data.y);
 
         //lastX=-1;
-        drawLine_remote(ctx,data.x,data.y,2,data.sid);
-        //drawEraser_remote(ctx,data.x,data.y,2,data.sid); 
-        }
+        
+        if ( data.rtool == 'brush' )
+        {   drawLine_remote(ctx,data.x,data.y,2,data.sid); }
+        
+        else if ( data.rtool == 'eraser' )
+        {   drawEraser_remote(ctx,data.x,data.y,2,data.sid); }
+
+        } 
+        
     );
 
     socket.on('touchend', 
@@ -401,7 +423,8 @@ function sendmouse(xpos, ypos) {
   // Make a object with x and y
   var data = {
     x: xpos,
-    y: ypos
+    y: ypos,
+    rtool : tool
   };
 
   // Send that object to the socket
@@ -414,7 +437,8 @@ function sendtouch(xpos, ypos) {
   // Make a object with x and y
   var data = {
     x: xpos,
-    y: ypos
+    y: ypos,
+    rtool : tool
   };
 
   // Send that object to the socket
@@ -422,7 +446,6 @@ function sendtouch(xpos, ypos) {
 }
 
 var onTool = function() {
-	
 	if ( tool == 'brush' )
 	{	drawLine(ctx,mouseX,mouseY,2); }
 	

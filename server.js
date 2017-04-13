@@ -76,6 +76,20 @@ io.sockets.on('connection', function (socket) {
       }
     );
 
+    socket.on('touchend',
+      function(data) {
+        // Data comes in as whatever was sent, including objects
+        console.log("Received: 'touchend' ");
+      
+        // Send it to all other clients
+        socket.broadcast.emit('touchend', socket.id);
+        
+        // This is a way to send to everyone including sender
+        // io.sockets.emit('message', "this goes to everyone");
+
+      }
+    );
+
     socket.on('clear',
     	function() {
     	console.log("Canvas cleared");
