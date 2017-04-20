@@ -96,6 +96,11 @@ io.sockets.on('connection', function (socket) {
         socket.broadcast.emit('clear');
       }
     );
+
+    socket.on('img', function(dataURL) {
+    console.log("Image Uploaded");
+    socket.broadcast.emit('img', dataURL);
+});
     
     socket.on('disconnect', function() {
       console.log("User has disconnected");

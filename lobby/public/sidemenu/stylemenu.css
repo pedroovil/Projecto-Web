@@ -248,6 +248,20 @@ ul {
   background-color: #222628;
 }
 
+.imagetool {
+  background-position: center;
+  background-image: url(../imgs/imageicon.png);
+  background-repeat:no-repeat;
+  border: none;
+  cursor:pointer;
+  overflow: hidden;
+  outline:none;
+}
+
+.imagetool:hover {
+  background-color: #222628;
+}
+
 .cleartool {
   background-position: center;
   background-image: url(../imgs/clearicon.png);

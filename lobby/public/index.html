@@ -13,32 +13,32 @@
 
 <body onload="init()">
         <div id="functions">
-            
             <span id="tools">
                 <nav class="nav">
                   <div class="burger">
                     <div class="burger__patty"></div>
                   </div>
-                
                   <ul class="nav__list">
                     <li class="nav__item">
                       <a href="#1" class="nav__link penciltool">
-                          <button id="brush" class="nav__link penciltool"></button>
+                          <button id="brush" class="nav__link penciltool" accesskey="p"></button>
                       </a>
                     </li>
                     <li class="nav__item">
                       <a href="#2" class="nav__link erasertool scrolly">
-                          <button id="eraser" class="nav__link erasertool scrolly"></button>
+                          <button id="eraser" class="nav__link erasertool scrolly"  accesskey="b"></button>
+                      </a>
+                    </li>
+                    <li class="nav__item">
+                      <a class="nav__link imagetool scrolly">
+                      <input type="file" id="fileUpload"
+                      style=opacity:0;
+                      />
                       </a>
                     </li>
                     <li class="nav__item">
                       <a href="#3" class="nav__link cleartool">
-                          <div id="clear" class="nav__link cleartool"></div>
-                      </a>
-                    </li>
-                    <li class="nav__item">
-                      <a href="#4" class="nav__link xxx scrolly">
-                       <!--   <button id="eraser" class="nav__link xxx scrolly"></button> -->
+                          <div id="clear" class="nav__link cleartool" accesskey="c"></div>
                       </a>
                     </li>
                   </ul>

@@ -122,7 +122,7 @@ function drawLine_remote(ctx,x,y,size,socketid) {
     myMapCoord.set(socketid,lc);
 }
 
-function drawEraser(ctx,x,y) {
+function drawEraser(ctx,x,y,size) {
 
     console.log('local eraser');
     // If lastX is not set, set lastX and lastY to the current position 
@@ -161,10 +161,8 @@ function drawEraser(ctx,x,y) {
     lastY=y;
 }
 
-function drawEraser_remote(ctx,x,y,socketid) {
+function drawEraser_remote(ctx,x,y,size,socketid) {
     console.log('remote eraser');
-	//console.log('socket:');
-    //console.log(socketid);
 
     if (lc = myMapCoord.get(socketid)) {
 
@@ -227,7 +225,6 @@ function sketch_mouseDown() {
 // Keep track of the mouse button being released
 function sketch_mouseUp() {
     mouseDown=0;
-
     // Reset lastX and lastY to -1 to indicate that they are now invalid, since we have lifted the "pen"
     lastX=-1;
     lastY=-1;
@@ -336,7 +333,6 @@ function init() {
         {   drawEraser_remote(ctx,data.x,data.y,2,data.sid); }
 
         }
-
     );
 
     socket.on('mouseup', 
@@ -391,6 +387,16 @@ function init() {
         }
     );
 
+    socket.on('img', function(dataURL) {
+    console.log("Image uploaded");
+    var img = new Image;
+    img.onload = function(){
+      ctx.drawImage(img, 105, 50);
+    };
+    img.src = dataURL;
+
+});
+
     // If the browser supports the canvas tag, get the 2d drawing context for this canvas
     if (canvas.getContext)
         ctx = canvas.getContext('2d');
@@ -415,6 +421,26 @@ function init() {
     };
     imageObj.src = 'imgs/matematica.png';
     //************* 
+
+    //*********image upload***********
+    function el(id){return document.getElementById(id);}
+    function readImage() {
+        if ( this.files && this.files[0] ) {
+            var FR= new FileReader();
+            FR.onload = function(e) {
+               var img = new Image();
+               img.onload = function() {
+	               var image = ctx.drawImage(img, 105, 50);
+	               console.log("sendimg: ");
+	               socket.emit('img', e.target.result);
+               };
+               img.src = e.target.result;
+            };       
+            FR.readAsDataURL( this.files[0] );
+        }
+    }
+    el("fileUpload").addEventListener("change", readImage, false);
+    //******************************** 
 }
 
 function sendmouse(xpos, ypos) {

@@ -16,7 +16,7 @@ html, body {
 } /* just to be sure these are full screen*/
 
 #sketch {
-    width: 100%;
+    width: 2000px;
     height: 2000px;
     float:left;
     position:relative; /* Necessary for correct mouse co-ords in Firefox */
