@@ -276,6 +276,20 @@ ul {
   background-color: #222628;
 }
 
+.savetool {
+  background-position: center;
+  background-image: url(../imgs/saveicon.png);
+  background-repeat:no-repeat;
+  border: none;
+  cursor:pointer;
+  overflow: hidden;
+  outline:none;
+}
+
+.savetool:hover {
+  background-color: #222628;
+}
+
 .c-green {
   color: #68e6ac;
 }
