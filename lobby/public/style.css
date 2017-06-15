@@ -22,6 +22,11 @@ html, body {
     position:relative; /* Necessary for correct mouse co-ords in Firefox */
     cursor: crosshair;
 }
+
+#canvasInput {
+  display: none;
+}
+
 /*
 #toolbar{
     float: left;

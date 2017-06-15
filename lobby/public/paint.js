@@ -25,6 +25,16 @@ var socket;
 // current tool
 var tool = 'brush';
 
+// texttool
+var $input = $("#canvasInput");
+var texttool = {};
+//"tool" is just an object that holds various tools that you are probably going to reuse
+texttool.lineWidth = 10;
+texttool.color = "#000000";
+texttool.startx = 0;
+texttool.starty = 0;
+//*********
+
 $('#tools button').on('click touch', function(){
 	tool = $(this).attr('id');
 	console.log(tool);
@@ -206,11 +216,48 @@ function drawEraser_remote(ctx,x,y,size,socketid) {
     myMapCoord.set(socketid,lc);
 }
 
+function drawText(ctx,x,y,size) {
+    texttool.startx = x;
+    texttool.starty = y;
+    $input.css({
+      display: "block",
+      position: "absolute",
+      left: texttool.startx,
+      top: texttool.starty
+    }); 
+}
+
+$input.keyup(function(e) {
+  $(this).attr("placeholder", "Texto");
+  if (e.which === 13) {
+    e.preventDefault();
+    ctx.font = (2 * texttool.lineWidth) + "px sans-serif";
+    ctx.fillStyle = texttool.color;
+    //call fillText to push the content of input to the page
+    //this parses out the input's left and top coordinates and then sets the text to be at those coordinates
+    ctx.fillText($input.val(), parseInt($input.css("left")), parseInt($input.css("top")));
+    //save the context
+    ctx.save();
+    //set the display to none for the input and erase its value
+    $input.css("display", "none").val("");
+
+    console.log("sendtxt: ");
+	socket.emit('txt', ctx.fillText());
+  }
+  //Pressing Escape to cancel
+  if (e.which === 27) {
+    e.preventDefault();
+    //same as the last step of the enter button
+    //set the display to none for the input and erase its value
+    $input.css("display", "none").val("");
+  }
+});
+
 document.getElementById("clear").addEventListener("click", function clear(){
     if (confirm("Deseja apagar tudo?")) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            console.log("sendclear: ");
 
+            console.log("sendclear: ");
             socket.emit('clear');
     }
 });
@@ -223,12 +270,9 @@ var callDownload = function() {
     document.getElementById("save").addEventListener("click", callDownload);
     
     function download(canvas, filename) {
-
     //create a dummy CANVAS
-
     // create an "off-screen" anchor tag
-    var lnk = document.createElement('a'),
-        e;
+    var lnk = document.createElement('a'), e;
 
     // the key here is to set the download attribute of the a tag
     lnk.download = filename;
@@ -420,22 +464,24 @@ function init() {
         }
     );
 
-    socket.on('clear', 
-        function() {
+    socket.on('clear', function() {
         console.log("Canvas cleared");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-    );
+    });
 
     socket.on('img', function(dataURL) {
-    console.log("Image uploaded");
-    var img = new Image;
-    img.onload = function(){
-      ctx.drawImage(img, 105, 50);
-    };
-    img.src = dataURL;
+	    console.log("Image uploaded");
+	    var img = new Image;
+	    img.onload = function(){
+	      ctx.drawImage(img, 105, 50);
+	    };
+	    img.src = dataURL;
+	});
 
-});
+	socket.on('txt', function() {
+        console.log("Text");
+        ctx.fillText();
+    });
 
     // If the browser supports the canvas tag, get the 2d drawing context for this canvas
     if (canvas.getContext)
@@ -512,11 +558,16 @@ function sendtouch(xpos, ypos) {
 }
 
 var onTool = function() {
+	
 	if ( tool == 'brush' )
 	{	drawLine(ctx,mouseX,mouseY,2); }
 	
 	else if ( tool == 'eraser' )
 	{	drawEraser(ctx,mouseX,mouseY,2); }
+	
+	  else if ( tool == 'text' )
+	{	drawText(ctx,mouseX,mouseY,2); }
+	
 };
 
 var onToolTouch = function() {
@@ -526,4 +577,7 @@ var onToolTouch = function() {
 	
 	else if ( tool == 'eraser' )
 	{	drawEraser(ctx,touchX,touchY,2) }
+	
+	else if ( tool == 'text' )
+	{	drawText(ctx,touchX,touchY,2); }
 };

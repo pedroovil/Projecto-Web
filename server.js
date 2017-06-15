@@ -48,7 +48,7 @@ io.sockets.on('connection', function (socket) {
     );
 
     socket.on('touch',
-      function(data) {
+        function(data) {
         // Data comes in as whatever was sent, including objects
         console.log("Received: 'touch' " + data.x + " " + data.y);
         data.sid = socket.id;
@@ -58,9 +58,7 @@ io.sockets.on('connection', function (socket) {
         
         // This is a way to send to everyone including sender
         // io.sockets.emit('message', "this goes to everyone");
-
-      }
-    ); 
+    }); 
 
     socket.on('touchend',
     	function(data) {
@@ -73,8 +71,7 @@ io.sockets.on('connection', function (socket) {
         // This is a way to send to everyone including sender
         // io.sockets.emit('message', "this goes to everyone");
 
-      }
-    );
+    });
 
     socket.on('touchend',
       function(data) {
@@ -87,20 +84,22 @@ io.sockets.on('connection', function (socket) {
         // This is a way to send to everyone including sender
         // io.sockets.emit('message', "this goes to everyone");
 
-      }
-    );
+    });
 
-    socket.on('clear',
-    	function() {
-    	console.log("Canvas cleared");
+    socket.on('clear', function() {
+        console.log("Canvas cleared");
         socket.broadcast.emit('clear');
-      }
-    );
+    });
 
     socket.on('img', function(dataURL) {
-    console.log("Image Uploaded");
-    socket.broadcast.emit('img', dataURL);
-});
+        console.log("Image Uploaded");
+        socket.broadcast.emit('img', dataURL);
+    });
+
+    socket.on('txt', function() {
+        console.log("Text");
+        socket.broadcast.emit('txt', ctx.fillText());
+    });
     
     socket.on('disconnect', function() {
       console.log("User has disconnected");

@@ -276,6 +276,20 @@ ul {
   background-color: #222628;
 }
 
+.texttool {
+  background-position: center;
+  background-image: url(../imgs/texticon.png);
+  background-repeat:no-repeat;
+  border: none;
+  cursor:pointer;
+  overflow: hidden;
+  outline:none;
+}
+
+.texttool:hover {
+  background-color: #222628;
+}
+
 .savetool {
   background-position: center;
   background-image: url(../imgs/saveicon.png);
