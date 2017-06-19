@@ -96,9 +96,9 @@ io.sockets.on('connection', function (socket) {
         socket.broadcast.emit('img', dataURL);
     });
 
-    socket.on('txt', function() {
-        console.log("Text");
-        socket.broadcast.emit('txt', ctx.fillText());
+    socket.on('txt', function(data) {
+       console.log(data);
+       socket.broadcast.emit('txt', data);
     });
     
     socket.on('disconnect', function() {

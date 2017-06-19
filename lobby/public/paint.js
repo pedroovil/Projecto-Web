@@ -239,10 +239,17 @@ $input.keyup(function(e) {
     //save the context
     ctx.save();
     //set the display to none for the input and erase its value
-    $input.css("display", "none").val("");
+    
 
     console.log("sendtxt: ");
-	socket.emit('txt', ctx.fillText());
+
+    var data = {
+    x: parseInt($input.css("left")),
+    y: parseInt($input.css("top")),
+    text: $input.val()
+  };
+	socket.emit('txt',data);
+	$input.css("display", "none").val("");
   }
   //Pressing Escape to cancel
   if (e.which === 27) {
@@ -478,10 +485,12 @@ function init() {
 	    img.src = dataURL;
 	});
 
-	socket.on('txt', function() {
-        console.log("Text");
-        ctx.fillText();
-    });
+	socket.on('txt', function(data) {
+	    console.log(data.text);
+	    ctx.font = (2 * texttool.lineWidth) + "px sans-serif";
+	    ctx.fillStyle = texttool.color;
+	    ctx.fillText(data.text, parseInt(data.x),parseInt(data.y));
+	});
 
     // If the browser supports the canvas tag, get the 2d drawing context for this canvas
     if (canvas.getContext)
