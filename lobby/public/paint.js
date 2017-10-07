@@ -1,8 +1,8 @@
 var canvas, ctx;
 
-var mouseX,mouseY,mouseDown=0;
+var mouseX, mouseY, mouseDown=0;
 
-var touchX,touchY;
+var touchX, touchY;
 
 var sketch = document.querySelector('#sketch');
 var sketch_style = getComputedStyle(sketch);
@@ -77,14 +77,6 @@ function drawLine(ctx,x,y,size) {
 }
 
 function drawLine_remote(ctx,x,y,size,socketid) {
-    //console.log('socket:');
-    //console.log(socketid);
-
-    // If lastX is not set, set lastX and lastY to the current position 
- //   if (lastrX==-1) {
-  //      lastrX=x;
-   //     lastrY=y;
-  //  }
 
  console.log('remote line');
  if (lc = myMapCoord.get(socketid)) {   
@@ -238,17 +230,16 @@ $input.keyup(function(e) {
     ctx.fillText($input.val(), parseInt($input.css("left")), parseInt($input.css("top")));
     //save the context
     ctx.save();
-    //set the display to none for the input and erase its value
-    
 
     console.log("sendtxt: ");
 
     var data = {
-    x: parseInt($input.css("left")),
-    y: parseInt($input.css("top")),
-    text: $input.val()
-  };
+	    x: parseInt($input.css("left")),
+	    y: parseInt($input.css("top")),
+	    text: $input.val()
+  	};
 	socket.emit('txt',data);
+	//set the display to none for the input and erase its value
 	$input.css("display", "none").val("");
   }
   //Pressing Escape to cancel
@@ -271,12 +262,12 @@ document.getElementById("clear").addEventListener("click", function clear(){
 
 // download canvas
 var callDownload = function() {
-        download(sketch,'apontamento.png');
-        };
+    download(sketch,'apontamento.jpg');
+};
     
-    document.getElementById("save").addEventListener("click", callDownload);
+document.getElementById("save").addEventListener("click", callDownload);
     
-    function download(canvas, filename) {
+function download(canvas, filename) {
     //create a dummy CANVAS
     // create an "off-screen" anchor tag
     var lnk = document.createElement('a'), e;
@@ -375,7 +366,8 @@ function sketch_touchMove(e) {
     // Update the touch co-ordinates
     getTouchPos(e);
 
-    // During a touchmove event, unlike a mousemove event, we don't need to check if the touch is engaged, since there will always be contact with the screen by definition.
+    // During a touchmove event, unlike a mousemove event, 
+    //we don't need to check if the touch is engaged, since there will always be contact with the screen by definition.
     onToolTouch();
     sendtouch(touchX,touchY);
 
@@ -495,6 +487,8 @@ function init() {
     // If the browser supports the canvas tag, get the 2d drawing context for this canvas
     if (canvas.getContext)
         ctx = canvas.getContext('2d');
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Check that we have a valid context to draw on/with before adding event handlers
     if (ctx) {
@@ -512,7 +506,7 @@ function init() {
     //***Matematica***  
     var imageObj = new Image();
     imageObj.onload = function() {
-    ctx.drawImage(imageObj, 30, 0);
+    	ctx.drawImage(imageObj, 30, 0);
     };
     imageObj.src = 'imgs/matematica.png';
     //************* 
@@ -521,7 +515,7 @@ function init() {
     function el(id){return document.getElementById(id);}
     function readImage() {
         if ( this.files && this.files[0] ) {
-            var FR= new FileReader();
+            var FR = new FileReader();
             FR.onload = function(e) {
                var img = new Image();
                img.onload = function() {
@@ -549,7 +543,7 @@ function sendmouse(xpos, ypos) {
   };
 
   // Send that object to the socket
-  socket.emit('mouse',data);
+  socket.emit('mouse', data);
 }
 
 function sendtouch(xpos, ypos) {
@@ -563,7 +557,7 @@ function sendtouch(xpos, ypos) {
   };
 
   // Send that object to the socket
-  socket.emit('touch',data);
+  socket.emit('touch', data);
 }
 
 var onTool = function() {
@@ -574,7 +568,7 @@ var onTool = function() {
 	else if ( tool == 'eraser' )
 	{	drawEraser(ctx,mouseX,mouseY,2); }
 	
-	  else if ( tool == 'text' )
+	 else if ( tool == 'text' )
 	{	drawText(ctx,mouseX,mouseY,2); }
 	
 };
