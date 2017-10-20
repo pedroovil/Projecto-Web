@@ -220,7 +220,7 @@ function drawText(ctx,x,y,size) {
 }
 
 $input.keyup(function(e) {
-  $(this).attr("placeholder", "Texto");
+  $(this).attr("placeholder", "ESC para cancelar");
   if (e.which === 13) {
     e.preventDefault();
     ctx.font = (2 * texttool.lineWidth) + "px sans-serif";
