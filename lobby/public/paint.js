@@ -153,7 +153,7 @@ function drawEraser(ctx,x,y,size) {
     ctx.lineTo(x,y);
     
     // Set the line thickness and draw the line
-    ctx.lineWidth = 5;
+    ctx.lineWidth = 12;
     ctx.stroke();
     
     ctx.closePath();
@@ -197,7 +197,7 @@ function drawEraser_remote(ctx,x,y,size,socketid) {
     ctx.lineTo(x,y);
     
     // Set the line thickness and draw the line
-    ctx.lineWidth = 5;
+    ctx.lineWidth = 12;
     ctx.stroke();
     
     ctx.closePath();
