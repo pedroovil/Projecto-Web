@@ -506,7 +506,7 @@ function init() {
     //***Matematica***  
     var imageObj = new Image();
     imageObj.onload = function() {
-    	ctx.drawImage(imageObj, 110, 6);
+    	ctx.drawImage(imageObj, 105, 4);
     };
     imageObj.src = 'imgs/highermat.png'; 
     //************* 
