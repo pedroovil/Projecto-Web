@@ -506,7 +506,7 @@ function init() {
     //***Matematica***  
     var imageObj = new Image();
     imageObj.onload = function() {
-    	ctx.drawImage(imageObj, 105, 4);
+    	ctx.drawImage(imageObj, 105, 3);
     };
     imageObj.src = 'imgs/highermat.png'; 
     //************* 
@@ -519,7 +519,7 @@ function init() {
             FR.onload = function(e) {
                var img = new Image();
                img.onload = function() {
-	               var image = ctx.drawImage(img, 105, 50);
+	               var image = ctx.drawImage(img, 105, 56);
 	               console.log("sendimg: ");
 	               socket.emit('img', e.target.result);
                };
