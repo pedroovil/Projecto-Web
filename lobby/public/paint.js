@@ -503,13 +503,13 @@ function init() {
         canvas.addEventListener('touchmove', sketch_touchMove, false);
     }
 
-    //***Matematica***  
+   /* //***Matematica***  
     var imageObj = new Image();
     imageObj.onload = function() {
     	ctx.drawImage(imageObj, 105, 3);
     };
     imageObj.src = 'imgs/highermat.png'; 
-    //************* 
+    //************* */
 
     //*********image upload***********
     function el(id){return document.getElementById(id);}
