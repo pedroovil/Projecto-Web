@@ -278,7 +278,7 @@ function download(canvas, filename) {
     // convert canvas content to data-uri for link. When download
     // attribute is set the content pointed to by link will be
     // pushed as "download" in HTML5 capable browsers
-    lnk.href = canvas.toDataURL();
+    lnk.href = canvas.toDataURL('image/jpeg', 1.0);
 
     // create a "fake" click-event to trigger the download
     if (document.createEvent) {
